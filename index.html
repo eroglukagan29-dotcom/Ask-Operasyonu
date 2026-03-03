@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sana Özel Bir Mesaj</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root { --soft-pink: #fff5f7; --deep-pink: #ff8fab; --text: #4a4a4a; }
+        body { margin: 0; padding: 0; font-family: 'Poppins', sans-serif; background: var(--soft-pink); display: flex; justify-content: center; align-items: center; height: 100vh; transition: all 1.5s ease; overflow: hidden; }
+        .card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); padding: 40px; border-radius: 30px; box-shadow: 0 15px 35px rgba(255, 143, 171, 0.2); text-align: center; width: 360px; transition: all 1s ease; border: 1px solid white; position: relative; z-index: 10; }
+        .dot-container { display: flex; justify-content: center; gap: 8px; margin-bottom: 25px; flex-wrap: wrap; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--deep-pink); transition: 0.3s; }
+        .dot.active { background: var(--deep-pink); transform: scale(1.2); box-shadow: 0 0 10px var(--deep-pink); }
+        .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+        .num-btn { background: white; border: none; padding: 15px; border-radius: 50%; font-size: 18px; color: var(--text); cursor: pointer; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.03); aspect-ratio: 1; }
+        .num-btn:hover { background: var(--soft-pink); transform: translateY(-2px); }
+        .num-btn:active { transform: scale(0.9); background: var(--deep-pink); color: white; }
+        .user-note { font-size: 13px; color: #888; font-style: italic; margin-top: 15px; line-height: 1.4; border-top: 1px solid #eee; padding-top: 15px; }
+        #terminal { display: none; text-align: left; color: #00ff00; font-family: 'Courier New', Courier, monospace; font-size: 14px; background: #000; padding: 25px; border-radius: 20px; height: 280px; overflow-y: auto; box-shadow: 0 0 20px rgba(0,255,0,0.2); border: 1px solid #333; }
+        .choice-btns { display: none; margin-top: 20px; }
+        .choice-btn { background: transparent; border: 1px solid #00ff00; color: #00ff00; padding: 10px 20px; margin: 5px; cursor: pointer; border-radius: 5px; transition: 0.3s; font-family: monospace; }
+        .choice-btn:hover { background: #00ff00; color: black; box-shadow: 0 0 15px #00ff00; }
+    </style>
+</head>
+<body>
+
+<audio id="typeSound" loop>
+    <source src="keyboard-typing-sound-effect.mp3" type="audio/mpeg">
+</audio>
+
+<div class="card" id="main-card">
+    <div id="stage1">
+        <h2 style="font-family: 'Dancing Script', cursive; color: var(--deep-pink); margin-bottom: 5px; font-size: 32px;">Giriş Yap...</h2>
+        <div class="dot-container" id="dots">
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        </div>
+        <div class="numpad">
+            <button class="num-btn" onclick="addNum(1)">1</button>
+            <button class="num-btn" onclick="addNum(2)">2</button>
+            <button class="num-btn" onclick="addNum(3)">3</button>
+            <button class="num-btn" onclick="addNum(4)">4</button>
+            <button class="num-btn" onclick="addNum(5)">5</button>
+            <button class="num-btn" onclick="addNum(6)">6</button>
+            <button class="num-btn" onclick="addNum(7)">7</button>
+            <button class="num-btn" onclick="addNum(8)">8</button>
+            <button class="num-btn" onclick="addNum(9)">9</button>
+            <button class="num-btn" onclick="clearDots()" style="font-size: 12px; color: red;">SİL</button>
+            <button class="num-btn" onclick="addNum(0)">0</button>
+        </div>
+        <div class="user-note">
+            "İpucu: Şifre adının harflerinin alfabedeki sırasından oluşuyor.<br>
+            Örneğin Ali A=1 L=15 İ=12 şifre: 11512"
+        </div>
+    </div>
+
+    <div id="stage3">
+        <div id="terminal"></div>
+        <div class="choice-btns" id="btns">
+            <button class="choice-btn" onclick="sendResult('EVET')">EVET</button>
+            <button class="choice-btn" onclick="sendResult('HAYIR')">HAYIR</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let input = "";
+    const CORRECT_PIN = "10128124";
+    const typeSound = document.getElementById('typeSound');
+
+    function addNum(n) {
+        if(input.length < 8) {
+            input += n;
+            updateDots();
+            if(input === CORRECT_PIN) {
+                setTimeout(startTerminal, 600);
+            } else if(input.length === 8) {
+                setTimeout(() => { alert("Maalesef, şifre yanlış tekrar dene!"); clearDots(); }, 300);
+            }
+        }
+    }
+
+    function updateDots() {
+        document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i < input.length));
+    }
+
+    function clearDots() { input = ""; updateDots(); }
+
+    function startTerminal() {
+        document.getElementById('stage1').style.display = 'none';
+        document.getElementById('main-card').style.background = '#000';
+        document.getElementById('main-card').style.border = '1px solid #00ff00';
+        document.body.style.background = '#050505';
+        document.getElementById('terminal').style.display = 'block';
+
+        typeSound.play();
+
+        const text = ">> Şifre Doğrulandı: 10128124\n>> Erişim: TAM YETKİ\n>> Dosya: Kalbimdeki_Sır.txt\n\nSeni uzaktan izlemek bir şiirin içinde hapsolmak gibi\nDizelerin arasında kaybolup yine de seni aramak gibi...\nBu 8 haneli şifreyi çözdüğün gibi, içimdeki sessizliği de çözer misin?\n\nBenimle bir yola çıkmaya ne dersin?";
+        let i = 0;
+
+        function type() {
+            if(i < text.length) {
+                document.getElementById('terminal').innerHTML += text.charAt(i) === '\n' ? '<br>' : text.charAt(i);
+                i++;
+                setTimeout(type, 61);
+            } else {
+                document.getElementById('btns').style.display = 'block';
+                typeSound.pause();
+                typeSound.currentTime = 0;
+            }
+        }
+        type();
+    }
+
+    // MAİL GÖNDERME FONKSİYONU
+    function sendResult(choice) {
+        const endpoint = "https://formspree.io/f/mjgenvln"; // Videondaki URL
+        
+        fetch(endpoint, {
+            method: "POST",
+            body: JSON.stringify({ "Cevap": choice }),
+            headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' }
+        }).then(response => {
+            if (response.ok) {
+                alert("Cevabın bana ulaştı... :)");
+            } else {
+                alert("Küçük bir hata oluştu ama ben ne diyeceğini biliyorum...");
+            }
+        }).catch(error => {
+            alert("Sistem meşgul ama cevabın kalbimde!");
+        });
+    }
+</script>
+</body>
+</html>
